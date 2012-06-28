@@ -10,6 +10,7 @@ var starttime = (new Date()).getTime();
 
 var forecast = null;
 forecast = scraper.scrape();
+
 // every 10 minutes poll for the image.
 setInterval(function() {
     forecast = scraper.scrape();

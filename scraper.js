@@ -1,6 +1,7 @@
-// Electricity meters Scraper
+// Electricity meter Scraper
 var fs = require('fs'),
-    https = require ('https');
+    https = require ('https'),
+    mongo = require('mongoskin');
 
 var options = {
   host: 'modstroem.dk',
@@ -9,16 +10,26 @@ var options = {
   method: 'GET'
 };
 
+var conn = mongo.db('emeterreader:modstroem@staff.mongohq.com:10024/emeterimages');
+var db = conn.collection('images');
+var lastImage = null;
+
+function init() {
+    fs.readFile("latest.png", "binary", function(error, file) {
+        if (!error) {
+            lastImage = file;
+        }
+    });
+}
+
 function scrape_https() {
     console.log("Scraping emeter html");
     var req = https.request(options, function (res) {
-    //request({ uri:'https://modstroem.dk/imagesource.aspx?idMetercam=ABC230E934&idGateway=974301783' }, function (error, response, body) {
         if (res.statusCode !== 200) {
             console.log('Error when contacting modstroem.dk');
         } else {
-            console.log("emeter has been read");
+            console.log("emeter html has been read");
             res.on('data', function(d) {
-                fs.writeFile('latest.html', d);
             });
         }
     });
@@ -29,8 +40,15 @@ function scrape_https() {
     });
 }
 
+
+
 function scrape_png() {
     console.log("Scraping emeter png");
+    
+    if (lastImage === null ) {
+        init();
+    }
+    
     //var req=https.request(options, function (res) {
     var req=https.request({ host:'modstroem.dk', path:'/imagesource.aspx?idMetercam=ABC230E934&idGateway=974301783' }, function (res) {
         if (res.statusCode !== 200) {
@@ -38,7 +56,13 @@ function scrape_png() {
         } else {
             console.log("emeter has been read");
             res.on('data', function(d) {
-                fs.writeFile('latest.png', d);
+                if ( d != lastImage ) {
+                    var timestamp = Date.now();
+                    console.log("Storing new image at " + timestamp);
+                    db.insert( { timestamp: timestamp, image: d } );
+                    fs.writeFile('latest.png', d);
+                    lastImage = d;
+                }
             });
         }
     });
