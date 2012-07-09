@@ -13,11 +13,26 @@ var options = {
 var conn = mongo.db('mongodb://emeterreader:modstroem@staff.mongohq.com:10024/emeterimages');
 var db = conn.collection('images');
 var lastImage = null;
+var lastAcquire = null;
 
 function init() {
+    /*
     fs.readFile("latest.png", "binary", function(error, file) {
         if (!error) {
             lastImage = file;
+        }
+    });
+    */
+    
+    db.findOne({},{timestamp: -1}, {limit:1}, function(err, cursor) {
+        if (err) {
+            console.log("scraper.init: db.find got error: " + err);
+        } else {
+            cursor.each(function (err, item) {
+                console.log("Scraper.init: Newest timestamp is from " + item.timestamp);
+                lastImage = item.image;
+                lastAcquire = Date.now();
+            });
         }
     });
 }
@@ -62,6 +77,7 @@ function scrape_png() {
                     db.insert( { timestamp: timestamp, image: d } );
                     fs.writeFile('latest.png', d);
                     lastImage = d;
+                    lastAcquire = timestamp;
                 }
             });
         }
@@ -78,3 +94,4 @@ function scrape() {
 }
 
 exports.scrape = scrape;
+exports.init = init;

@@ -9,7 +9,8 @@ var PORT = 12345; // process.env.PORT; // || process.env.VCAP_APP_PORT;
 var starttime = (new Date()).getTime();
 
 var forecast = null;
-forecast = scraper.scrape();
+// forecast = scraper.scrape();
+scraper.init();
 
 // every 10 minutes poll for the image.
 setInterval(function() {
