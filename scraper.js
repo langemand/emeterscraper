@@ -19,18 +19,38 @@ var lastAcquire = null;
 function init() {
     conn = mongo.db('mongodb://emeterreader:modstroem@staff.mongohq.com:10024/emeterimages');
     db = conn.collection('images');    
+
+    var dublets=new Array();
+    var icnt=0;
+    var imageBefore=null;
+
     db.find({}, function(err, cursor) {
         if (err) {
             console.log("scraper.init: db.find got error: " + err);
         } else {
             cursor.each(function (err, item) {
                 if (item ) {
+                    // register dublets
+                    if ( imageBefore && item.image.toString() == imageBefore.toString() ) {
+                        dublets[icnt] = item.timestamp;
+                        icnt++;
+                    } else {
+                        imageBefore = item.image;
+                    }
+
+                    // register newest
                     if ( item.timestamp > lastAcquire ) {
                     	lastImage = item.image;
                     	lastAcquire = item.timestamp;
                     }
                 } else {
-                    console.log("Scraper.init: Newest timestamp is from " + lastAcquire);
+                    console.log("Scraper.init: Newest timestamp is from " + lastAcquire + ", " + icnt + " dublets found");
+                    for (i=0; i<icnt; i++)
+                    {
+                         db.remove({timestamp: dublets[i]}, function(err, result) {
+                             if (!err) console.log('Dublet deleted');
+                         });
+                    }
                 }
             });
         }
@@ -71,7 +91,7 @@ function scrape_png() {
         } else {
             console.log("emeter has been read");
             res.on('data', function(d) {
-                if ( d != lastImage ) {
+                if ( d.toString() != lastImage.toString() ) {
                     var timestamp = Date.now();
                     console.log("Storing new image at " + timestamp);
                     db.insert( { timestamp: timestamp, image: d } );

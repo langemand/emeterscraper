@@ -1,6 +1,10 @@
 {
   "name": "emeterscraper",
-  "version": "0.0.1",
+  "version": "0.0.1-1beta",
+  "author": "Henrik Scheel <henrik.scheel@spjeldager.dk> (http://www.spjeldager.dk/)",
+  "description": "Gathering electricity meter readings from modstroem.dk, archiving them in MongoHQ, and providing access to the gatered images via http.",
+  "keywords": "png image version gathering",
+  "scripts": {"start": "node index.js"},
   "dependencies": {
     "mongoskin": "0.3.6"
   },
