@@ -75,7 +75,8 @@ function list(response) {
                     console.writeline("cursor.each got error: " + err);
                 } else {    
                     if ( item ) {
-                        body3 = body3 + "<A HREF=/image/" + item.timestamp.toString() + "/>" + item.timestamp.toString() + "<BR>";
+                        var d = new Date(item.timestamp);
+                        body3 = body3 + "<A HREF=/image/" + item.timestamp.toString() + "/>" + item.timestamp.toString() + " " + d.toUTCString() + "<img src=\"data:image/png;base64,"+ item.image.toString('base64') + "\" alt=\"embedded meter image\"><BR>";
                     }
                     else
                     {
