@@ -3,7 +3,7 @@ var fs = require("fs"),
     url = require("url");
 
 
-var conn = mongo.db('emeterreader:modstroem@staff.mongohq.com:10024/emeterimages');
+var conn = mongo.db('mongodb://emeterreader:modstroem@staff.mongohq.com:10024/emeterimages');
 var db = conn.collection('images');
 
 function start(response) {
