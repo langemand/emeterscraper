@@ -3,7 +3,7 @@
 var scraper = require("./scraper");
 
 var HOST = null; // localhost
-var PORT = 12345; // process.env.PORT; // || process.env.VCAP_APP_PORT;
+var PORT = 8124; // process.env.PORT; // || process.env.VCAP_APP_PORT;
 
 // when the daemon started
 var starttime = (new Date()).getTime();
