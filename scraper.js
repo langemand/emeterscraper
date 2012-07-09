@@ -16,23 +16,19 @@ var lastImage = null;
 var lastAcquire = null;
 
 function init() {
-    /*
-    fs.readFile("latest.png", "binary", function(error, file) {
-        if (!error) {
-            lastImage = file;
-        }
-    });
-    */
-    
-    db.find({},{timestamp: 1}, {limit:1}, function(err, cursor) {
+    db.find({}, function(err, cursor) {
         if (err) {
             console.log("scraper.init: db.find got error: " + err);
         } else {
             cursor.each(function (err, item) {
-//		item = cursor;
-                console.log("Scraper.init: Newest timestamp is from " + item.timestamp);
-                lastImage = item.image;
-                lastAcquire = Date.now();
+                if (item ) {
+                    if ( item.timestamp > lastAcquire ) {
+                    	lastImage = item.image;
+                    	lastAcquire = item.timestamp;
+                    }
+                } else {
+                    console.log("Scraper.init: Newest timestamp is from " + lastAcquire);
+                }
             });
         }
     });
