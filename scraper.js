@@ -24,11 +24,12 @@ function init() {
     });
     */
     
-    db.findOne({},{timestamp: -1}, {limit:1}, function(err, cursor) {
+    db.find({},{timestamp: 1}, {limit:1}, function(err, cursor) {
         if (err) {
             console.log("scraper.init: db.find got error: " + err);
         } else {
             cursor.each(function (err, item) {
+//		item = cursor;
                 console.log("Scraper.init: Newest timestamp is from " + item.timestamp);
                 lastImage = item.image;
                 lastAcquire = Date.now();
