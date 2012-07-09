@@ -29,9 +29,11 @@ function init() {
             console.log("scraper.init: db.find got error: " + err);
         } else {
             cursor.each(function (err, item) {
-                console.log("Scraper.init: Newest timestamp is from " + item.timestamp);
-                lastImage = item.image;
-                lastAcquire = Date.now();
+                if (item) {
+                    console.log("Scraper.init: Newest timestamp is from " + item.timestamp);
+                    lastImage = item.image;
+                    lastAcquire = Date.now();
+                }
             });
         }
     });
