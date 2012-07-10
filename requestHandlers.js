@@ -66,7 +66,7 @@ function list(response) {
             body2 = 'Fetched ' + count + ' images until now<BR>';
         }
     });
-    db.find({}, function(err, cursor) {
+    db.find().sort({timestamp: -1}, function(err, cursor) {
         if (err) {
             console.log("requestHandler: db.find got error: " + err);
         } else {    
@@ -75,6 +75,12 @@ function list(response) {
                     console.log("cursor.each got error: " + err);
                 } else {    
                     if ( item ) {
+                        if ( !item.timestamp ) {
+                            console.log("Encountered null timestamp from db!");
+                        }
+                        if ( ! item.image ) { 
+                            console.log("Encountered null image from db!");
+                        }
                         var d = new Date(item.timestamp);
                         body3 = body3 + "<A HREF=/image/" + item.timestamp.toString() + "/>" + item.timestamp.toString() + " " + d.toUTCString() + "<img src=\"data:image/png;base64,"+ item.image.toString('base64') + "\" alt=\"embedded meter image\"><BR>";
                     }

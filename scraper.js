@@ -24,7 +24,7 @@ function init() {
     var icnt=0;
     var imageBefore=null;
 
-    db.find({}, function(err, cursor) {
+    db.find().sort({timestamp: 1}, function(err, cursor) {
         if (err) {
             console.log("scraper.init: db.find got error: " + err);
         } else {
