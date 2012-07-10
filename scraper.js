@@ -31,8 +31,6 @@ function init() {
                         dublets[icnt] = item.timestamp;
                         icnt++;
                     } else {
-//console.log("image: " + item.image);
-//console.log("before:" + imageBefore);
                         imageBefore = item.image;
                     }
 
@@ -90,12 +88,7 @@ function scrape_png() {
             console.log("emeter has been read");
             res.on('data', function(d) {
                 if ( d.toString() != lastImage.toString() ) {
-                    var timestamp = Date.now();
-                    console.log("Storing new image at " + timestamp);
-                    db.insert( { timestamp: timestamp, image: d } );
-                    fs.writeFile('latest.png', d);
-                    lastImage = d;
-                    lastAcquire = timestamp;
+                   insertIfNew(d);
                 }
             });
         }
@@ -104,6 +97,34 @@ function scrape_png() {
     
     req.on('error', function(e) {
         console.error(e);
+    });
+}
+
+function insertIfNew( image ) {
+    db.find({ "timestamp": { $gt: lastAcquire } }, function (err, cursor) {
+        if (err) {
+            console.log("scraper.insertIfNew: db.find got error: " + err);
+        } else {
+            cursor.each(function (err, item) {
+                if (item ) {
+                    console.log("Found timestamp > lastAquire (" + lastAcquire + ") in db: " + item.timestamp);
+                    lastAcquire = item.timestamp;
+                    lastImage = item.image;
+                } else {
+                    if ( image.toString() != lastImage.toString() ) {
+                        var timestamp = Date.now();
+                        console.log( "Image fetched from modstroem differ from lastImage, inserting in db with timestamp:"+timestamp);
+                        var timestamp = Date.now();
+                        console.log("Storing new image at " + timestamp);
+                        db.insert( { timestamp: timestamp, image: image } );
+                        lastAcquire = timestamp;
+                        lastImage = image;
+                    } else {
+                        console.log("lastImage is the same at the one fetched from modstroem, not inserting");
+                    }
+                }
+            });
+        }
     });
 }
 

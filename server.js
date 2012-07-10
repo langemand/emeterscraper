@@ -12,7 +12,7 @@ var forecast = null;
 // forecast = scraper.scrape();
 scraper.init();
 
-// every 10 minutes poll for the image.
+// every 10 minute poll for the image.
 setInterval(function() {
     forecast = scraper.scrape();
 }, 10 * 60 * 1000);
