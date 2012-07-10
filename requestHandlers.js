@@ -61,18 +61,18 @@ function list(response) {
     'test<BR>';
     db.count(function(err,count) {
         if (err) {
-            console.writeline("db.count got error: " + err);
+            console.log("db.count got error: " + err);
         } else {    
             body2 = 'Fetched ' + count + ' images until now<BR>';
         }
     });
     db.find({}, function(err, cursor) {
         if (err) {
-            console.writeline("db.find got error: " + err);
+            console.log("requestHandler: db.find got error: " + err);
         } else {    
             cursor.each(function(err,item) {
                 if (err) {
-                    console.writeline("cursor.each got error: " + err);
+                    console.log("cursor.each got error: " + err);
                 } else {    
                     if ( item ) {
                         var d = new Date(item.timestamp);

@@ -10,12 +10,16 @@ var options = {
   method: 'GET'
 };
 
-var conn = mongo.db('mongodb://emeterreader:modstroem@staff.mongohq.com:10024/emeterimages');
-var db = conn.collection('images');
+var conn = null;
+var db = null;
+
 var lastImage = null;
 var lastAcquire = null;
 
 function init() {
+    conn = mongo.db('mongodb://emeterreader:modstroem@staff.mongohq.com:10024/emeterimages');
+    db = conn.collection('images');    
+
     var dublets=new Array();
     var icnt=0;
     var imageBefore=null;
