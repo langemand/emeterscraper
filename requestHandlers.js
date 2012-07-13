@@ -50,6 +50,7 @@ function show(response) {
 }
 
 function list(response) {
+    var scale = '10%';
     var body2 = '';
     var body3 = '';
     var body = '<html>'+
@@ -82,7 +83,7 @@ function list(response) {
                             console.log("Encountered null image from db!");
                         }
                         var d = new Date(item.timestamp);
-                        body3 = body3 + "<A HREF=/image/" + item.timestamp.toString() + "/>" + item.timestamp.toString() + " " + d.toUTCString() + "<img src=\"data:image/png;base64,"+ item.image.toString('base64') + "\" alt=\"embedded meter image\"><BR>";
+                        body3 = body3 + "<A HREF=/image/" + item.timestamp.toString() + ".png>" + "<img src=\"data:image/png;base64,"+ item.image.toString('base64') + "\" alt=\"embedded meter image\" height=\"" + scale + "\" width=\"" + scale + "\"> " + d.toUTCString() + "</A><BR>";
                     }
                     else
                     {
@@ -101,44 +102,36 @@ function list(response) {
     });
 }    
 
-function latest(response) {
-  console.log("Request handler 'latest' was called.");
-  
-  fs.readFile("latest.png", "binary", function(error, file) {
-    if(error) {
-      response.writeHead(500, {"Content-Type": "text/plain"});
-      response.write(error + "\n");
-      response.end();
-    } else {
-      response.writeHead(200, {"Content-Type": "image/png"});
-      response.write(file, "binary");
-      response.end();
-    }
-  });  
-}
-
-
 
 function image(response, request) {
   console.log("Request handler 'image' was called.");
-  var reqtime = Number( url.parse(request.url).pathname.split("/")[2]);
+  var imageFilename = url.parse(request.url).pathname.split("/")[2];
+  console.log("Image filename: " + imageFilename);
+  var reqtime = Number( imageFilename.split(".")[0]);
+  console.log("Unix time extracted from image file name: " + reqtime);
   db.findOne( { timestamp: reqtime }, function(error, item) {
     if(error || item === null ) {
       response.writeHead(500, {"Content-Type": "text/plain"});
       response.write(error + "\n");
       response.end();
     } else {
-      response.writeHead(200, {"Content-Type": "image/png"});
-      response.write(item.image, "binary");
-      response.end();
+      if ( item ) {
+          console.log("Found item with timestamp: " + item.timestamp);
+          response.writeHead(200, {"Content-Type": "image/png"});
+          response.write(new Buffer(item.image.toString('base64'),'base64'));
+          response.end();
+      } else {
+          console.log("Item is null!");
+      }
     }
-  });  
+  });
 }
+
 
 
 
 exports.start = start;
 exports.image = image;
-exports.show = show;
-exports.latest = latest;
+//exports.show = show;
+//exports.latest = latest;
 exports.list = list;
